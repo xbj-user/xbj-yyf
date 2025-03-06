@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单提交成功</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .success-container {
+            width: 60%;
+            margin: 50px auto;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--background-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            font-size: 18px;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            margin-top: 30px;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 12px 25px;
+            margin: 0 10px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background-color: #45a049;
+        }
+
+        .secondary-button {
+            background-color: var(--blue-color);
+        }
+
+        .secondary-button:hover {
+            background-color: #2980b9;
+        }
+
+        .order-details {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .order-details h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .detail-item {
+            margin: 10px 0;
+            color: var(--text-color);
+        }
+
+        .detail-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}">首页</a>
+            <a href="{{ url_for('cart_view') }}">购物车</a>
+        </nav>
+    </header>
+
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h1 class="success-title">订单提交成功！</h1>
+        <p class="success-message">
+            感谢您的购买！您的订单已经成功提交。<br>
+            我们将尽快处理您的订单并安排发货。
+        </p>
+
+        <div class="order-details">
+            <h3>订单信息</h3>
+            <div class="detail-item">
+                <span class="detail-label">订单编号:</span>
+                <span>{{ order_id if order_id else '系统生成中' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">下单时间:</span>
+                <span>{{ order_time if order_time else now.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">收货人:</span>
+                <span>{{ name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">联系电话:</span>
+                <span>{{ phone }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">收货地址:</span>
+                <span>{{ address }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">订单金额:</span>
+                <span>¥{{ "%.2f"|format(total_price) }}</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="action-button">继续购物</a>
+            <a href="#" class="action-button secondary-button">查看订单</a>
+        </div>
+    </div>
+
+    <script>
+        // 5秒后自动跳转到首页
+        setTimeout(function() {
+            window.location.href = "{{ url_for('index') }}";
+        }, 10000);
+    </script>
+</body>
+
+</html>

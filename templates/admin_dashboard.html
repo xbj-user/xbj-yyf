@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员面板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 新增导航栏样式 */
+        .admin-header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 1rem 2rem;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            padding: 8px 16px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #cc0000;
+        }
+
+        /* 优化容器样式 */
+        .admin-container {
+            max-width: 1660px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-form {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .upload-form h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .upload-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            margin-left: 15%;
+        }
+
+        .upload-form input,
+        .upload-form textarea {
+            width: 80%;
+            max-width: 500px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .upload-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .upload-form button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .upload-form button:hover {
+            background-color: #45a049;
+        }
+
+        /* 商品列表样式 */
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(750px, 1fr));
+            /* 增大商品卡宽度 */
+            row-gap: 10px;
+            /* 垂直间距缩小为10px */
+            column-gap: 1px;
+            /* 保持水平间距15px */
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 8px;
+            /* 追加底部间距微调 */
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 175px;
+            /* 增大图片高度 */
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-card h3 {
+            margin: 15px 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .product-card p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .product-card .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .product-card button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .product-card button.edit-btn {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .product-card button.edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .product-card button.delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .product-card button.delete-btn:hover {
+            background-color: #cc0000;
+        }
+
+        /* 新增用户管理样式 */
+        .user-management {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-management h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .user-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-list th,
+        .user-list td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-list th {
+            background-color: #f5f5f5;
+        }
+
+        .delete-user-btn {
+            padding: 6px 12px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-user-btn:hover {
+            background-color: #cc0000;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 10px;
+            }
+
+            .upload-form {
+                padding: 15px;
+            }
+
+            .upload-form input,
+            .upload-form textarea {
+                width: 90%;
+            }
+
+            .product-list {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                /* 小屏幕上卡片宽度调整为280px */
+                row-gap: 8px;
+                /* 移动端垂直间距更小 */
+                column-gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 新增导航栏 -->
+    <div class="admin-header">
+        <h1>管理员面板</h1>
+        <a href="{{ url_for('logout') }}" class="logout-btn">退出登录</a>
+    </div>
+
+    <div class="admin-container">
+        <div class="upload-form">
+            <h2>上传商品</h2>
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <form method="POST" enctype="multipart/form-data" onsubmit="return validateProductForm()">
+                <div class="form-group">
+                    <label for="name">商品名称:</label>
+                    <input type="text" id="name" name="name" required minlength="2" maxlength="100">
+                    <div class="error-hint" id="nameError"></div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="price">价格:</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0.01" required>
+                    <div class="error-hint" id="priceError"></div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="description">描述:</label>
+                    <textarea id="description" name="description" rows="3" maxlength="1000"></textarea>
+                    <div class="error-hint" id="descriptionError"></div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="image">商品图片:</label>
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif" required>
+                    <small class="text-hint">支持格式：JPEG, PNG, GIF（最大 5MB）</small>
+                    <div class="error-hint" id="imageError"></div>
+                </div>
+            
+                <div class="form-group">
+                    <label for="stock">库存:</label>
+                    <input type="number" id="stock" name="stock" required min="0">
+                    <div class="error-hint" id="stockError"></div>
+                </div>
+            
+                <button type="submit" id="submitBtn">上传商品</button>
+            </form>
+        </div>
+
+        <h2>所有商品</h2>
+        <div class="product-list">
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <p>价格: ¥{{ product.price }}</p>
+                <p>库存: {{ product.stock }}</p>
+                <div class="actions">
+                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="edit-btn">编辑</a>
+                    <button onclick="deleteProduct({{ product.id }})" class="delete-btn">删除</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 修改用户管理部分 -->
+    <div class="user-management">
+        <h2>用户管理</h2>
+        <div class="user-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>注册时间</th>
+                        <th>最后登录</th>
+                        <th>订单数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.register_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else '从未登录' }}</td>
+                        <td>{{ user.order_count }}</td>
+                        <td>
+                            {% if user.username != 'admin' %}
+                            <button onclick="deleteUser('{{ user.username }}')" class="delete-user-btn">删除</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 添加新的脚本 -->
+<script>
+function validateProductForm() {
+    let isValid = true;
+    const name = document.getElementById('name').value;
+    const price = document.getElementById('price').value;
+    const stock = document.getElementById('stock').value;
+    const image = document.getElementById('image').files[0];
+
+    // 验证商品名称
+    if (name.length < 2 || name.length > 100) {
+        document.getElementById('nameError').textContent = '商品名称长度必须在2-100字符之间';
+        document.getElementById('nameError').style.display = 'block';
+        isValid = false;
+    }
+
+    // 验证价格
+    if (price <= 0) {
+        document.getElementById('priceError').textContent = '价格必须大于0';
+        document.getElementById('priceError').style.display = 'block';
+        isValid = false;
+    }
+
+    // 验证库存
+    if (stock < 0) {
+        document.getElementById('stockError').textContent = '库存不能为负数';
+        document.getElementById('stockError').style.display = 'block';
+        isValid = false;
+    }
+
+    // 验证图片
+    if (image) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (image.size > maxSize) {
+            document.getElementById('imageError').textContent = '图片大小不能超过5MB';
+            document.getElementById('imageError').style.display = 'block';
+            isValid = false;
+        }
+    }
+
+    if (isValid) {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').textContent = '上传中...';
+    }
+
+    return isValid;
+}
+
+function deleteProduct(productId) {
+    if (confirm('确定要删除这个商品吗？')) {
+        fetch(`/delete_product/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('删除失败，请稍后重试');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('删除失败，请稍后重试');
+        });
+    }
+}
+
+function deleteUser(username) {
+    if (confirm(`确定要删除用户 ${username} 吗？`)) {
+        fetch(`/delete_user/${username}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();  // 删除成功后刷新页面
+                } else {
+                    response.json().then(data => {
+                        alert(data.error || '删除失败');  // 显示错误信息
+                    });
+                }
+            })
+            .catch(error => {
+                alert('删除失败，请稍后再试');
+                console.error('删除失败:', error);
+            });
+    }
+}
+</script>
+
+<!-- 添加新的样式 -->
+<style>
+.error-message {
+    background-color: #fed7d7;
+    border: 1px solid #f56565;
+    color: #c53030;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.error-hint {
+    color: #c53030;
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: none;
+}
+
+.text-hint {
+    color: #718096;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+</style>
+</body>
+
+</html>

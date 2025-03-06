@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 登录框容器样式 */
+        .login-container {
+            width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* 确保内部元素可以绝对定位 */
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #4299e1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+            font-size: 0.9em;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .switch-mode {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .switch-mode a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+
+        /* 注册按钮样式 */
+        .register-btn {
+            position: absolute;
+            /* 绝对定位 */
+            top: 20px;
+            /* 距离登录框顶部 */
+            right: 20px;
+            /* 距离登录框右侧 */
+            color: #007BFF;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .register-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <a href="{{ url_for('register') }}" class="register-btn">注册</a>
+        <h1 class="login-title">登录</h1>
+        {% if error %}
+        <div class="error-message" style="color: #e53e3e; text-align: center; margin-bottom: 15px;">
+            {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="请输入用户名" 
+                    required
+                    value="{{ request.form.username if request.form.username }}"
+                    pattern="[A-Za-z0-9]+"
+                    title="用户名只能包含英文字母和数字">
+                <div class="error-message" id="username-error"></div>
+            </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" 
+                id="password" 
+                name="password" 
+                class="form-control" 
+                placeholder="请输入密码" 
+                required
+                minlength="6">
+            <div class="error-message" id="password-error"></div>
+        </div>
+        <button type="submit" class="submit-btn">登录</button>
+    </form>
+    <div class="switch-mode">
+        <a href="{{ url_for('admin_login') }}">管理员登录</a>
+    </div>
+</div>
+
+<script>
+    function validateForm() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        let isValid = true;
+
+        // 验证用户名
+        if (!/^[A-Za-z0-9]+$/.test(username)) {
+            document.getElementById('username-error').textContent = '用户名只能包含英文字母和数字';
+            document.getElementById('username-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('username-error').style.display = 'none';
+        }
+
+        // 验证密码
+        if (password.length < 6) {
+            document.getElementById('password-error').textContent = '密码至少需要6个字符';
+            document.getElementById('password-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        return isValid;
+    }
+
+    // 实时验证用户名
+    document.getElementById('username').addEventListener('input', function(e) {
+        const errorElement = document.getElementById('username-error');
+        if (!/^[A-Za-z0-9]+$/.test(e.target.value)) {
+            errorElement.textContent = '用户名只能包含英文字母和数字';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.style.display = 'none';
+        }
+    });
+</script>
+
+<!-- 添加新的样式 -->
+<style>
+.error-message {
+    color: #e53e3e;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: none;
+}
+</style>
+</body>
+
+</html>

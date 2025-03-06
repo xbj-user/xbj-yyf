@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购物车</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .cart-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .cart-table th, .cart-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            padding: 5px 10px;
+            border: none;
+            background: #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .stock-warning {
+            color: #e53e3e;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('index') }}">电商平台</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-link">首页</a>
+                {% if 'username' in session %}
+                <span class="welcome-text">{{ session['username'] }}</span>
+                <a href="{{ url_for('logout') }}" class="nav-link">退出登录</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link">登录</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <div class="cart-container">
+        <h1>购物车</h1>
+        {% if cart %}
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>商品信息</th>
+                        <th>单价</th>
+                        <th>数量</th>
+                        <th>小计</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr>
+                        <td>
+                            <div class="product-info">
+                                <img src="{{ url_for('static', filename=item['product']['image_url']) }}"
+                                     alt="{{ item['product']['name'] }}" 
+                                     class="product-image">
+                                <div>
+                                    <h3>{{ item['product']['name'] }}</h3>
+                                    {% if item['quantity'] > item['product']['stock'] %}
+                                    <span class="stock-warning">库存不足（剩余：{{ item['product']['stock'] }}）</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>¥{{ "%.2f"|format(item['product']['price']) }}</td>
+                        <td>
+                            <div class="quantity-control">
+                                <a href="{{ url_for('remove_from_cart', product_id=item['product']['id']) }}?action=reduce" 
+                                   class="quantity-btn">-</a>
+                                <span>{{ item['quantity'] }}</span>
+                                <a href="{{ url_for('add_to_cart', product_id=item['product']['id']) }}" 
+                                   class="quantity-btn">+</a>
+                            </div>
+                        </td>
+                        <td>¥{{ "%.2f"|format(item['product']['price'] * item['quantity']) }}</td>
+                        <td>
+                            <a href="{{ url_for('remove_from_cart', product_id=item['product']['id']) }}?action=remove" 
+                               class="delete-btn">删除</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>总计:</span>
+                    <span class="total-price">¥{{ "%.2f"|format(total_price) }}</span>
+                </div>
+                <div class="cart-actions">
+                    <a href="{{ url_for('index') }}" class="btn back-btn">继续购物</a>
+                    <a href="{{ url_for('checkout') }}" class="btn checkout-btn">去结算</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-cart">
+                <p>购物车还是空的，快去选购商品吧！</p>
+                <a href="{{ url_for('index') }}" class="btn back-btn">去购物</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // 检查库存状态并更新结算按钮
+        function checkStock() {
+            const stockWarnings = document.querySelectorAll('.stock-warning');
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            
+            if (stockWarnings.length > 0) {
+                checkoutBtn.style.opacity = '0.5';
+                checkoutBtn.style.cursor = 'not-allowed';
+                checkoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    alert('购物车中有商品库存不足，请修改数量后再结算');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkStock);
+    </script>
+</body>
+</html>

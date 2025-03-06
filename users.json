@@ -1,0 +1,14 @@
+{
+    "admin": {
+        "password": "123456",
+        "register_time": "2025-03-01"
+    },
+    "xiongbaojin": {
+        "password": "123456",
+        "register_time": "2025-03-03 22:34:31"
+    },
+    "yyf": {
+        "password": "123456",
+        "register_time": "2025-03-03 22:35:03"
+    }
+}

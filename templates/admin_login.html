@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .login-container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>管理员登录</h1>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="admin_username">管理员用户名:</label>
+                <input type="text" 
+                    name="admin_username" 
+                    id="admin_username" 
+                    required 
+                    pattern="[A-Za-z0-9]+"
+                    title="只能使用字母和数字"
+                    autocomplete="off">
+                <div class="error-hint" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="admin_password">管理员密码:</label>
+                <input type="password" 
+                    name="admin_password" 
+                    id="admin_password" 
+                    required 
+                    minlength="6"
+                    autocomplete="off">
+                <div class="error-hint" id="passwordError"></div>
+            </div>
+
+            <button type="submit" id="submitBtn">登录</button>
+        </form>
+        <div class="links">
+            <a href="{{ url_for('login') }}" class="back-link">返回普通用户登录</a>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            let isValid = true;
+            const username = document.getElementById('admin_username').value;
+            const password = document.getElementById('admin_password').value;
+
+            // 验证用户名
+            if (!/^[A-Za-z0-9]+$/.test(username)) {
+                document.getElementById('usernameError').textContent = '用户名只能包含字母和数字';
+                document.getElementById('usernameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('usernameError').style.display = 'none';
+            }
+
+            // 验证密码
+            if (password.length < 6) {
+                document.getElementById('passwordError').textContent = '密码至少需要6个字符';
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+            }
+
+            if (isValid) {
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').textContent = '登录中...';
+            }
+
+            return isValid;
+        }
+
+        // 防止表单重复提交
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .error-hint {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</body>
+</html>

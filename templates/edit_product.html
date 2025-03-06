@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑商品 - {{ product.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 基础容器样式 */
+        .edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 标题样式 */
+        .page-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        /* 表单组样式 */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        /* 输入控件样式 */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4299e1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 图片预览区 */
+        .image-preview {
+            position: relative;
+            margin: 20px 0;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .current-image {
+            max-width: 300px;
+            height: auto;
+            border-radius: 6px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 按钮样式 */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .edit-container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-brand">
+                <a href="{{ url_for('index') }}">电商管理后台</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link">返回面板</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="edit-container">
+        <h1 class="page-title">编辑商品</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <!-- 当前图片展示 -->
+            <div class="image-preview">
+                <p>当前商品图片：</p>
+                <img src="{{ url_for('static', filename=product.image_url) }}" alt="当前商品图片" class="current-image">
+            </div>
+
+            <!-- 表单字段 -->
+            <div class="form-group">
+                <label for="name">商品名称</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ product.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="price">价格</label>
+                <input type="number" id="price" name="price" class="form-control" step="0.01"
+                    value="{{ product.price }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">商品描述</label>
+                <textarea id="description" name="description" class="form-control">{{ product.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image">更换图片</label>
+                <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                <small class="text-hint">支持格式：JPEG, PNG, GIF</small>
+            </div>
+
+            <div class="form-group">
+                <label for="stock">库存数量</label>
+                <input type="number" id="stock" name="stock" class="form-control" value="{{ product.stock }}" required>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">保存修改</button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">取消编辑</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
