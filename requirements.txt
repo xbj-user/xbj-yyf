@@ -1,4 +1,4 @@
-﻿asn1crypto==1.5.1
+asn1crypto==1.5.1
 blinker==1.9.0
 click==8.1.8
 colorama==0.4.6

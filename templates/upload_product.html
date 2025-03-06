@@ -60,7 +60,7 @@
             const price = document.getElementById('price').value;
             const stock = document.getElementById('stock').value;
             const image = document.getElementById('image').files[0];
-
+    
             // 验证商品名称
             if (name.length < 2) {
                 document.getElementById('nameError').textContent = '商品名称至少需要2个字符';
@@ -68,7 +68,7 @@
             } else {
                 document.getElementById('nameError').textContent = '';
             }
-
+    
             // 验证价格
             if (price <= 0) {
                 document.getElementById('priceError').textContent = '价格必须大于0';
@@ -76,7 +76,7 @@
             } else {
                 document.getElementById('priceError').textContent = '';
             }
-
+    
             // 验证库存
             if (stock < 0) {
                 document.getElementById('stockError').textContent = '库存不能为负数';
@@ -84,18 +84,21 @@
             } else {
                 document.getElementById('stockError').textContent = '';
             }
-
+    
             // 验证图片
             if (image) {
                 const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
                 if (!validTypes.includes(image.type)) {
                     document.getElementById('imageError').textContent = '请上传有效的图片文件（JPG、PNG、GIF）';
                     isValid = false;
+                } else if (image.size > 5 * 1024 * 1024) { // 添加文件大小限制检查
+                    document.getElementById('imageError').textContent = '图片大小不能超过5MB';
+                    isValid = false;
                 } else {
                     document.getElementById('imageError').textContent = '';
                 }
             }
-
+    
             return isValid;
         }
     </script>

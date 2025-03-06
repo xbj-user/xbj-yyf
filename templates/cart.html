@@ -97,7 +97,8 @@
                     <tr>
                         <td>
                             <div class="product-info">
-                                <img src="{{ url_for('static', filename=item['product']['image_url']) }}"
+                                <!-- 修改这一行，使用product_image路由 -->
+                                <img src="{{ url_for('product_image', product_id=item['product']['id']) }}"
                                      alt="{{ item['product']['name'] }}" 
                                      class="product-image">
                                 <div>

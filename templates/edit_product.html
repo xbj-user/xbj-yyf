@@ -145,7 +145,8 @@
             <!-- 当前图片展示 -->
             <div class="image-preview">
                 <p>当前商品图片：</p>
-                <img src="{{ url_for('static', filename=product.image_url) }}" alt="当前商品图片" class="current-image">
+                <!-- 修改这一行，使用product_image路由 -->
+                <img src="{{ url_for('product_image', product_id=product.id) }}" alt="当前商品图片" class="current-image">
             </div>
 
             <!-- 表单字段 -->

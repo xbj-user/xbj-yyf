@@ -36,7 +36,8 @@
             {% for product in products %}
             <div class="product-card">
                 <a href="{{ url_for('product_detail', product_id=product.id) }}">
-                    <img src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+                    <!-- 修改这一行，使用product_image路由 -->
+                    <img src="{{ url_for('product_image', product_id=product.id) }}" alt="{{ product.name }}">
                     <h2>{{ product.name }}</h2>
                     <p class="price">¥{{ "%.2f"|format(product.price) }}</p>
                     <p class="stock">库存: {{ product.stock }} 件</p>
