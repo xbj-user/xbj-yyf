@@ -1,13 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
-from decimal import Decimal  # 导入 Decimal 模块
-from datetime import datetime  # 新增导入 datetime 模块
-import os
-import json
-import re
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from werkzeug.utils import secure_filename
 from decimal import Decimal
 from datetime import datetime
@@ -29,11 +22,12 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # 初始化数据库
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 # 定义数据模型
 class User(db.Model):
     username = db.Column(db.String(80), primary_key=True)
     password = db.Column(db.String(120), nullable=False)
+    register_time = db.Column(db.DateTime(timezone=False), nullable=False, default=datetime.utcnow)
     register_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 # Product模型，包含图片数据存储
@@ -50,7 +44,6 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -259,18 +252,6 @@ def admin_login():
             return '管理员用户名或密码错误', 403
     return render_template('admin_login.html')
 
-
-# 修改Product模型
-class Product(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    description = db.Column(db.Text)
-    image_data = db.Column(db.LargeBinary)  # 存储图片二进制数据
-    image_name = db.Column(db.String(200))  # 存储图片名称
-    stock = db.Column(db.Integer, nullable=False)
-
-# 修改上传图片的代码
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if 'admin' not in session:
@@ -303,6 +284,10 @@ def admin_dashboard():
             return redirect(url_for('admin_dashboard'))
         else:
             return '无效的文件格式'
+
+    products = Product.query.all()
+    users = User.query.all()
+    return render_template('admin_dashboard.html', products=products, users=users)
 
 # 添加一个路由来提供图片
 @app.route('/product_image/<int:product_id>')
